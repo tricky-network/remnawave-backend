@@ -42,9 +42,11 @@ jobs:
           echo "version=$version" >> $GITHUB_OUTPUT
           echo "image=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/backend" >> $GITHUB_OUTPUT
           echo "build_time=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
-          # Frontend releases are tagged with the same version as the backend
-          echo "frontend_url=https://github.com/remnawave/frontend/releases/download/$version/remnawave-frontend.zip" >> $GITHUB_OUTPUT
-          echo "frontend_commit=$(curl -s https://api.github.com/repos/remnawave/frontend/commits/$version | jq -r '.sha')" >> $GITHUB_OUTPUT
+          # Patched frontend fork publishes releases tagged <backend version>-<suffix>
+          frontend_tag="$version-$TAG_SUFFIX"
+          frontend_repo="${GITHUB_REPOSITORY_OWNER}/frontend"
+          echo "frontend_url=https://github.com/$frontend_repo/releases/download/$frontend_tag/remnawave-frontend.zip" >> $GITHUB_OUTPUT
+          echo "frontend_commit=$(curl -s https://api.github.com/repos/$frontend_repo/commits/$frontend_tag | jq -r '.sha')" >> $GITHUB_OUTPUT
 
       - name: Build and push
         uses: docker/build-push-action@v7
